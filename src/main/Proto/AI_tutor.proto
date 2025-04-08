@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package education;
+
+// Service Definition
+service AITutor {
+  rpc getTopics (GetTopicsRequest) returns (GetTopicsResponse);
+  rpc setTopic (SetTopicRequest) returns (SetTopicResponse);
+  rpc generateQuiz (GenerateQuizRequest) returns (stream QuizQuestion);
+  rpc submitAnswers (stream AnswerRequest) returns (QuizResultResponse);
+  rpc tutorChat (stream ChatMessage) returns (stream ChatMessage);
+}
+
+// Message Definitions
+message Topic {
+  string id = 1;
+  string title = 2;
+}
+
+message QuizQuestion {
+  string question = 1;
+  repeated string options = 2;
+  string correct_answer = 3;
+}
+
+message GetTopicsRequest {
+  string api_key = 1;
+}
+
+message GetTopicsResponse {
+  repeated Topic topics = 1;
+}
+
+message SetTopicRequest {
+  string topic_id = 1;
+  string api_key = 2;
+}
+
+message SetTopicResponse {
+  string message = 1;
+}
+
+message GenerateQuizRequest {
+  string expression = 1;
+  string api_key = 2;
+}
+
+message AnswerRequest {
+  string question_id = 1;
+  string selected_answer = 2;
+}
+
+message QuizResultResponse {
+  int32 score = 1;
+  string feedback = 2;
+}
+
+message ChatMessage {
+  string sender = 1;
+  string content = 2;
+}
