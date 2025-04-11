@@ -44,10 +44,28 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
         TOPIC_QUIZZES.put("2", scienceQuestions);
     }
 
+    /**
+     * Purpuse: return by refence
+     * @param request
+     * @param responseObserver 
+     */
+    
+    // (1) retornar diretamente o que vc precisa
+    // public List<Topics> getTopics() {}
+    
+    // (2) retornar ou responder por referênia / devolver por referência / alterar por referência
+    /*public void getTopics(T param) {
+        param.response = "";
+        param.setResponse("");
+        param.callback();
+        // e outros exemplos possíveis
+    }*/
+    
     @Override
     public void getTopics(GetTopicsRequest request, StreamObserver<GetTopicsResponse> responseObserver) {
         if (!request.getApiKey().equals(API_KEY)) {
-            responseObserver.onError(Status.UNAUTHENTICATED.asRuntimeException());
+            // handling error when API key is not correct
+            responseObserver.onError(Status.PERMISSION_DENIED.asRuntimeException());
             return;
         }
 
@@ -56,7 +74,9 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
             .addTopics(Topic.newBuilder().setId("2").setTitle("Science").build())
             .build();
         
+        // set the return value
         responseObserver.onNext(response);
+        // finishing the service reponse
         responseObserver.onCompleted();
     }
 

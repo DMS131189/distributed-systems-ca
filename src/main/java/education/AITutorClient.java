@@ -21,6 +21,14 @@ public class AITutorClient {
 
         AITutorGrpc.AITutorBlockingStub stub = AITutorGrpc.newBlockingStub(channel);
 
+        // Example: Get topics with no API KEY
+        try {
+            GetTopicsResponse topicsError = stub.getTopics(
+                GetTopicsRequest.newBuilder().setApiKey(null).build());
+        } catch (Exception e) {
+            System.out.println("Error on trying get topics. Description: " + e.getMessage());
+        }
+
         // Example: Get topics
         GetTopicsResponse topics = stub.getTopics(
             GetTopicsRequest.newBuilder().setApiKey("secure123").build());
