@@ -76,19 +76,20 @@ public class AITutorGUI extends JFrame {
 
         Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
                 GenerateQuizRequest.newBuilder()
-                        // .setTopicId(topicId)
+                        .setExpression(topicId)
                         .setApiKey("secure123")
                         .build());
 
-        new Thread(() -> {
+        /*new Thread(() -> {*/
             while (questions.hasNext()) {
                 QuizQuestion question = questions.next();
-                SwingUtilities.invokeLater(() -> {
+                //SwingUtilities.invokeLater(() -> {
                     questionArea.setText(question.getQuestion());
                     optionsPanel.removeAll();
 
                     for (String option : question.getOptionsList()) {
                         JButton optionBtn = new JButton(option);
+                        // TODO: neste ponto, quando escolher a opção correta, deve seguir para a próxima questão
                         optionBtn.addActionListener(e -> {
                             boolean correct = option.equals(question.getCorrectAnswer());
                             JOptionPane.showMessageDialog(quizFrame,
@@ -99,22 +100,26 @@ public class AITutorGUI extends JFrame {
 
                     optionsPanel.revalidate();
                     optionsPanel.repaint();
-                });
+                //});
 
-                try {
+                /*try {
                     Thread.sleep(3000); // Wait for user to answer
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                }
+                }*/
             }
 
-            SwingUtilities.invokeLater(() -> {
+            /*SwingUtilities.invokeLater(() -> {
                 JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
                 quizFrame.dispose();
             });
-        }).start();
+        }).start();*/
+
 
         quizFrame.setVisible(true);
+
+        // JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
+        // quizFrame.dispose();
     }
 
     private void showChatWindow() {

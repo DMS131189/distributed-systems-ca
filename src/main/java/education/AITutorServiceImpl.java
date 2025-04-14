@@ -82,7 +82,7 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
 
     @Override
     public void generateQuiz(GenerateQuizRequest request, StreamObserver<QuizQuestion> responseObserver) {
-        List<QuizQuestion> questions = TOPIC_QUIZZES.get("1");
+        List<QuizQuestion> questions = TOPIC_QUIZZES.getOrDefault(request.getExpression(), Collections.emptyList());
         
         for (QuizQuestion question : questions) {
             responseObserver.onNext(question);
