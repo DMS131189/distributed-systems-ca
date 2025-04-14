@@ -24,6 +24,15 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import javax.swing.*;
 import java.awt.*;
+import java.util.Iterator;
+
+import education.AITutorOuterClass.GenerateQuizRequest;
+import education.AITutorOuterClass.GetTopicsRequest;
+import education.AITutorOuterClass.GetTopicsResponse;
+import education.AITutorOuterClass.SetTopicResponse;
+import education.AITutorOuterClass.SetTopicRequest;
+import education.AITutorOuterClass.QuizQuestion;
+import education.AITutorOuterClass.Topic;
 
 public class AITutorModel2GUI {
     private static AITutorGrpc.AITutorBlockingStub stub;
