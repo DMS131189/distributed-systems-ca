@@ -7,8 +7,7 @@ import javax.swing.*;
         import java.awt.*;
         import java.awt.event.ActionEvent;
 import java.util.Iterator;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+
 
 import education.AITutorOuterClass.*;
 
@@ -62,65 +61,158 @@ public class AITutorGUI extends JFrame {
         add(welcomePanel, BorderLayout.CENTER);
     }
 
-    private void startQuiz(String topicId) {
-        JFrame quizFrame = new JFrame("Quiz");
-        quizFrame.setSize(400, 300);
-        quizFrame.setLayout(new BorderLayout());
+//    private void startQuiz(String topicId) {
+//        JFrame quizFrame = new JFrame("Quiz");
+//        quizFrame.setSize(400, 300);
+//        quizFrame.setLayout(new BorderLayout());
+//
+//        JTextArea questionArea = new JTextArea();
+//        questionArea.setEditable(false);
+//        quizFrame.add(new JScrollPane(questionArea), BorderLayout.CENTER);
+//
+//        JPanel optionsPanel = new JPanel(new GridLayout(0, 1));
+//        quizFrame.add(optionsPanel, BorderLayout.SOUTH);
+//
+//        Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
+//                GenerateQuizRequest.newBuilder()
+//                        .setExpression(topicId)
+//                        .setApiKey("secure123")
+//                        .build());
+//
+//        /*new Thread(() -> {*/
+//            while (questions.hasNext()) {
+//                QuizQuestion question = questions.next();
+//                //SwingUtilities.invokeLater(() -> {
+//                    questionArea.setText(question.getQuestion());
+//                    optionsPanel.removeAll();
+//
+//                    for (String option : question.getOptionsList()) {
+//                        JButton optionBtn = new JButton(option);
+//                        // TODO: neste ponto, quando escolher a opção correta, deve seguir para a próxima questão
+//                        optionBtn.addActionListener(e -> {
+//                            boolean correct = option.equals(question.getCorrectAnswer());
+//                            JOptionPane.showMessageDialog(quizFrame,
+//                                    correct ? "Correct!" : "Incorrect! The right answer is: " + question.getCorrectAnswer());
+//                        });
+//                        optionsPanel.add(optionBtn);
+//                    }
+//
+//                    optionsPanel.revalidate();
+//                    optionsPanel.repaint();
+//                //});
+//
+//                /*try {
+//                    Thread.sleep(3000); // Wait for user to answer
+//                } catch (InterruptedException e) {
+//                    Thread.currentThread().interrupt();
+//                }*/
+//            }
+//
+//            /*SwingUtilities.invokeLater(() -> {
+//                JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
+//                quizFrame.dispose();
+//            });
+//        }).start();*/
+//
+//
+//        quizFrame.setVisible(true);
+//
+//        // JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
+//        // quizFrame.dispose();
+//    }
+private void startQuiz(String topicId) {
+    JFrame quizFrame = new JFrame("Quiz");
+    quizFrame.setSize(500, 400);
+    quizFrame.setLayout(new BorderLayout());
+    quizFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        JTextArea questionArea = new JTextArea();
-        questionArea.setEditable(false);
-        quizFrame.add(new JScrollPane(questionArea), BorderLayout.CENTER);
+    JTextArea questionArea = new JTextArea();
+    questionArea.setEditable(false);
+    questionArea.setLineWrap(true);
+    questionArea.setWrapStyleWord(true);
+    questionArea.setFont(new Font("Arial", Font.PLAIN, 16));
 
-        JPanel optionsPanel = new JPanel(new GridLayout(0, 1));
-        quizFrame.add(optionsPanel, BorderLayout.SOUTH);
+    JPanel optionsPanel = new JPanel();
+    optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 
-        Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
-                GenerateQuizRequest.newBuilder()
-                        .setExpression(topicId)
-                        .setApiKey("secure123")
-                        .build());
+    JPanel mainPanel = new JPanel(new BorderLayout());
+    mainPanel.add(new JScrollPane(questionArea), BorderLayout.CENTER);
+    mainPanel.add(optionsPanel, BorderLayout.SOUTH);
+    quizFrame.add(mainPanel, BorderLayout.CENTER);
 
-        /*new Thread(() -> {*/
-            while (questions.hasNext()) {
-                QuizQuestion question = questions.next();
-                //SwingUtilities.invokeLater(() -> {
-                    questionArea.setText(question.getQuestion());
-                    optionsPanel.removeAll();
+    JButton nextButton = new JButton("Next Question");
+    nextButton.setEnabled(false);
+    quizFrame.add(nextButton, BorderLayout.SOUTH);
 
-                    for (String option : question.getOptionsList()) {
-                        JButton optionBtn = new JButton(option);
-                        // TODO: neste ponto, quando escolher a opção correta, deve seguir para a próxima questão
-                        optionBtn.addActionListener(e -> {
-                            boolean correct = option.equals(question.getCorrectAnswer());
-                            JOptionPane.showMessageDialog(quizFrame,
-                                    correct ? "Correct!" : "Incorrect! The right answer is: " + question.getCorrectAnswer());
-                        });
-                        optionsPanel.add(optionBtn);
-                    }
+    Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
+            GenerateQuizRequest.newBuilder()
+                    .setExpression(topicId)
+                    .setApiKey("secure123")
+                    .build());
 
-                    optionsPanel.revalidate();
-                    optionsPanel.repaint();
-                //});
+    // Substitui AtomicInteger por um array simples
+    final int[] score = {0};
+    final int[] totalQuestions = {0};
 
-                /*try {
-                    Thread.sleep(3000); // Wait for user to answer
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }*/
-            }
+    nextButton.addActionListener(e -> {
+        if (questions.hasNext()) {
+            showNextQuestion(questions.next(), questionArea, optionsPanel, nextButton, score);
+        } else {
+            JOptionPane.showMessageDialog(quizFrame,
+                    "Quiz completed!\nYour score: " + score[0] + "/" + totalQuestions[0]);
+            quizFrame.dispose();
+        }
+    });
 
-            /*SwingUtilities.invokeLater(() -> {
-                JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
-                quizFrame.dispose();
-            });
-        }).start();*/
-
-
-        quizFrame.setVisible(true);
-
-        // JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
-        // quizFrame.dispose();
+    if (questions.hasNext()) {
+        totalQuestions[0] = getQuestionCount(topicId); // Novo método para contar questões
+        showNextQuestion(questions.next(), questionArea, optionsPanel, nextButton, score);
     }
+
+    quizFrame.setVisible(true);
+}
+
+    // Novo método para contar questões
+    private int getQuestionCount(String topicId) {
+        switch(topicId) {
+            case "1": return 2; // Math
+            case "2": return 2; // Science
+            case "3": return 2; // History
+            default: return 0;
+        }
+    }
+
+    private void showNextQuestion(QuizQuestion question, JTextArea questionArea,
+                                  JPanel optionsPanel, JButton nextButton, int[] score) {
+        questionArea.setText(question.getQuestion());
+        optionsPanel.removeAll();
+
+        for (String option : question.getOptionsList()) {
+            JButton optionBtn = new JButton(option);
+            optionBtn.addActionListener(e -> {
+                boolean correct = option.equals(question.getCorrectAnswer());
+                if (correct) {
+                    score[0]++; // Incrementa a pontuação
+                    JOptionPane.showMessageDialog(optionsPanel, "Correct!", "Result", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(optionsPanel,
+                            "Incorrect! The correct answer is: " + question.getCorrectAnswer(),
+                            "Result", JOptionPane.ERROR_MESSAGE);
+                }
+                for (Component comp : optionsPanel.getComponents()) {
+                    comp.setEnabled(false);
+                }
+                nextButton.setEnabled(true);
+            });
+            optionsPanel.add(optionBtn);
+        }
+
+        nextButton.setEnabled(false);
+        optionsPanel.revalidate();
+        optionsPanel.repaint();
+    }
+
+
 
     private void showChatWindow() {
         JFrame chatFrame = new JFrame("AI Tutor Chat");

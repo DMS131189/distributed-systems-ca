@@ -128,7 +128,7 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
         };
     }
 
-    /*@Override
+    @Override
     public StreamObserver<ChatMessage> tutorChat(StreamObserver<ChatMessage> responseObserver) {
         return new StreamObserver<ChatMessage>() {
             @Override
@@ -168,5 +168,5 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
                 responseObserver.onCompleted();
             }
         };
-    }*/
+    }
 }
