@@ -61,65 +61,6 @@ public class AITutorGUI extends JFrame {
         add(welcomePanel, BorderLayout.CENTER);
     }
 
-//    private void startQuiz(String topicId) {
-//        JFrame quizFrame = new JFrame("Quiz");
-//        quizFrame.setSize(400, 300);
-//        quizFrame.setLayout(new BorderLayout());
-//
-//        JTextArea questionArea = new JTextArea();
-//        questionArea.setEditable(false);
-//        quizFrame.add(new JScrollPane(questionArea), BorderLayout.CENTER);
-//
-//        JPanel optionsPanel = new JPanel(new GridLayout(0, 1));
-//        quizFrame.add(optionsPanel, BorderLayout.SOUTH);
-//
-//        Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
-//                GenerateQuizRequest.newBuilder()
-//                        .setExpression(topicId)
-//                        .setApiKey("secure123")
-//                        .build());
-//
-//        /*new Thread(() -> {*/
-//            while (questions.hasNext()) {
-//                QuizQuestion question = questions.next();
-//                //SwingUtilities.invokeLater(() -> {
-//                    questionArea.setText(question.getQuestion());
-//                    optionsPanel.removeAll();
-//
-//                    for (String option : question.getOptionsList()) {
-//                        JButton optionBtn = new JButton(option);
-//                        // TODO: neste ponto, quando escolher a opção correta, deve seguir para a próxima questão
-//                        optionBtn.addActionListener(e -> {
-//                            boolean correct = option.equals(question.getCorrectAnswer());
-//                            JOptionPane.showMessageDialog(quizFrame,
-//                                    correct ? "Correct!" : "Incorrect! The right answer is: " + question.getCorrectAnswer());
-//                        });
-//                        optionsPanel.add(optionBtn);
-//                    }
-//
-//                    optionsPanel.revalidate();
-//                    optionsPanel.repaint();
-//                //});
-//
-//                /*try {
-//                    Thread.sleep(3000); // Wait for user to answer
-//                } catch (InterruptedException e) {
-//                    Thread.currentThread().interrupt();
-//                }*/
-//            }
-//
-//            /*SwingUtilities.invokeLater(() -> {
-//                JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
-//                quizFrame.dispose();
-//            });
-//        }).start();*/
-//
-//
-//        quizFrame.setVisible(true);
-//
-//        // JOptionPane.showMessageDialog(quizFrame, "Quiz completed!");
-//        // quizFrame.dispose();
-//    }
 private void startQuiz(String topicId) {
     JFrame quizFrame = new JFrame("Quiz");
     quizFrame.setSize(500, 400);
