@@ -4,11 +4,15 @@ package education;
 
 // Service Definition
 service AITutor {
-  rpc getTopics (GetTopicsRequest) returns (GetTopicsResponse);
-  rpc setTopic (SetTopicRequest) returns (SetTopicResponse);
-  rpc generateQuiz (GenerateQuizRequest) returns (stream QuizQuestion);
-  rpc submitAnswers (stream AnswerRequest) returns (QuizResultResponse);
-  rpc tutorChat (stream ChatMessage) returns (stream ChatMessage);
+    // unary
+      rpc getTopics (GetTopicsRequest) returns (GetTopicsResponse);
+      rpc setTopic (SetTopicRequest) returns (SetTopicResponse);
+    // server stream
+    rpc generateQuiz (GenerateQuizRequest) returns (stream QuizQuestion);
+    // client stream
+    rpc submitAnswers (stream AnswerRequest) returns (QuizResultResponse);
+    // bi-directional stream
+    rpc tutorChat (stream ChatMessage) returns (stream ChatMessage);
 }
 
 // Message Definitions
@@ -59,3 +63,6 @@ message ChatMessage {
   string sender = 1;
   string content = 2;
 }
+
+
+

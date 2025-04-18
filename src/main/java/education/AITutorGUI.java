@@ -2,16 +2,23 @@ package education;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.GrpcSslContexts;
 import io.grpc.stub.StreamObserver;
+
+import javax.net.ssl.SSLException;
 import javax.swing.*;
-        import java.awt.*;
-        import java.awt.event.ActionEvent;
+import java.awt.*;
+
+import java.io.File;
 import java.util.Iterator;
 
 
 import education.AITutorOuterClass.*;
 
 public class AITutorGUI extends JFrame {
+    // only allows using the server services with the correct API_KEY
+    private final String API_KEY = "sk-grpc-4a9f9e1b2c3d4e5f6a7b8c9d0e1f2a3b";
+
     private static AITutorGrpc.AITutorBlockingStub blockingStub;
     private static AITutorGrpc.AITutorStub asyncStub;
     private JTextArea chatArea;
@@ -42,7 +49,7 @@ public class AITutorGUI extends JFrame {
 
         // Get available topics
         GetTopicsResponse topics = blockingStub.getTopics(
-                GetTopicsRequest.newBuilder().setApiKey("secure123").build());
+                GetTopicsRequest.newBuilder().setApiKey(API_KEY).build());
 
         JPanel topicPanel = new JPanel(new GridLayout(0, 1));
         for (Topic topic : topics.getTopicsList()) {
@@ -52,7 +59,7 @@ public class AITutorGUI extends JFrame {
         }
 
         // Chat button
-        JButton chatBtn = new JButton("Start Chat with Tutor");
+        JButton chatBtn = new JButton("Start chat with AI Tutor");
         chatBtn.addActionListener(e -> showChatWindow());
 
         welcomePanel.add(topicPanel, BorderLayout.CENTER);
@@ -61,57 +68,57 @@ public class AITutorGUI extends JFrame {
         add(welcomePanel, BorderLayout.CENTER);
     }
 
-private void startQuiz(String topicId) {
-    JFrame quizFrame = new JFrame("Quiz");
-    quizFrame.setSize(500, 400);
-    quizFrame.setLayout(new BorderLayout());
-    quizFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    private void startQuiz(String topicId) {
+        JFrame quizFrame = new JFrame("Quiz");
+        quizFrame.setSize(500, 400);
+        quizFrame.setLayout(new BorderLayout());
+        quizFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-    JTextArea questionArea = new JTextArea();
-    questionArea.setEditable(false);
-    questionArea.setLineWrap(true);
-    questionArea.setWrapStyleWord(true);
-    questionArea.setFont(new Font("Arial", Font.PLAIN, 16));
+        JTextArea questionArea = new JTextArea();
+        questionArea.setEditable(false);
+        questionArea.setLineWrap(true);
+        questionArea.setWrapStyleWord(true);
+        questionArea.setFont(new Font("Arial", Font.PLAIN, 16));
 
-    JPanel optionsPanel = new JPanel();
-    optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 
-    JPanel mainPanel = new JPanel(new BorderLayout());
-    mainPanel.add(new JScrollPane(questionArea), BorderLayout.CENTER);
-    mainPanel.add(optionsPanel, BorderLayout.SOUTH);
-    quizFrame.add(mainPanel, BorderLayout.CENTER);
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(new JScrollPane(questionArea), BorderLayout.CENTER);
+        mainPanel.add(optionsPanel, BorderLayout.SOUTH);
+        quizFrame.add(mainPanel, BorderLayout.CENTER);
 
-    JButton nextButton = new JButton("Next Question");
-    nextButton.setEnabled(false);
-    quizFrame.add(nextButton, BorderLayout.SOUTH);
+        JButton nextButton = new JButton("Next Question");
+        nextButton.setEnabled(false);
+        quizFrame.add(nextButton, BorderLayout.SOUTH);
 
-    Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
-            GenerateQuizRequest.newBuilder()
-                    .setExpression(topicId)
-                    .setApiKey("secure123")
-                    .build());
+        Iterator<QuizQuestion> questions = blockingStub.generateQuiz(
+                GenerateQuizRequest.newBuilder()
+                        .setExpression(topicId)
+                        .setApiKey(API_KEY)
+                        .build());
 
-    // Substitui AtomicInteger por um array simples
-    final int[] score = {0};
-    final int[] totalQuestions = {0};
+        // Substitui AtomicInteger por um array simples
+        final int[] score = {0};
+        final int[] totalQuestions = {0};
 
-    nextButton.addActionListener(e -> {
+        nextButton.addActionListener(e -> {
+            if (questions.hasNext()) {
+                showNextQuestion(questions.next(), questionArea, optionsPanel, nextButton, score);
+            } else {
+                JOptionPane.showMessageDialog(quizFrame,
+                        "Quiz completed!\nYour score: " + score[0] + "/" + totalQuestions[0]);
+                quizFrame.dispose();
+            }
+        });
+
         if (questions.hasNext()) {
+            totalQuestions[0] = getQuestionCount(topicId);
             showNextQuestion(questions.next(), questionArea, optionsPanel, nextButton, score);
-        } else {
-            JOptionPane.showMessageDialog(quizFrame,
-                    "Quiz completed!\nYour score: " + score[0] + "/" + totalQuestions[0]);
-            quizFrame.dispose();
         }
-    });
 
-    if (questions.hasNext()) {
-        totalQuestions[0] = getQuestionCount(topicId); // Novo método para contar questões
-        showNextQuestion(questions.next(), questionArea, optionsPanel, nextButton, score);
+        quizFrame.setVisible(true);
     }
-
-    quizFrame.setVisible(true);
-}
 
     // Novo método para contar questões
     private int getQuestionCount(String topicId) {

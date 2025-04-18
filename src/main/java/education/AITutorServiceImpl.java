@@ -1,17 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package education;
 
 import education.AITutorOuterClass.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
+    private static final Logger logger = LoggerFactory.getLogger(AITutorServiceImpl.class);
     private static final Map<String, List<QuizQuestion>> TOPIC_QUIZZES = new HashMap<>();
-    private static final String API_KEY = "secure123";
+    private static final String API_KEY = "sk-grpc-4a9f9e1b2c3d4e5f6a7b8c9d0e1f2a3b";
 
     static {
         // Math Questions
@@ -59,36 +58,45 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
         );
         TOPIC_QUIZZES.put("3", historyQuestions);
     }
-    
+
     @Override
     public void getTopics(GetTopicsRequest request, StreamObserver<GetTopicsResponse> responseObserver) {
-        if (!request.getApiKey().equals(API_KEY)) {
-            // handling error when API key is not correct
+        if (!API_KEY.equals(request.getApiKey())) {
+            logger.error("Invalid API key in getTopics request.");
             responseObserver.onError(Status.PERMISSION_DENIED.asRuntimeException());
             return;
         }
 
+        logger.info("getTopics request received.");
+
         GetTopicsResponse response = GetTopicsResponse.newBuilder()
-            .addTopics(Topic.newBuilder().setId("1").setTitle("Math").build())
-            .addTopics(Topic.newBuilder().setId("2").setTitle("Science").build())
-            .addTopics(Topic.newBuilder().setId("3").setTitle("History").build())
-            .build();
-        
-        // set the return value
+                .addTopics(Topic.newBuilder().setId("1").setTitle("Math").build())
+                .addTopics(Topic.newBuilder().setId("2").setTitle("Science").build())
+                .addTopics(Topic.newBuilder().setId("3").setTitle("History").build())
+                .build();
+
         responseObserver.onNext(response);
-        // finishing the service reponse
         responseObserver.onCompleted();
     }
 
     @Override
     public void generateQuiz(GenerateQuizRequest request, StreamObserver<QuizQuestion> responseObserver) {
+        if (!API_KEY.equals(request.getApiKey())) {
+            logger.error("Invalid API key in generateQuiz request.");
+            responseObserver.onError(Status.PERMISSION_DENIED.asRuntimeException());
+            return;
+        }
+
+        logger.info("generateQuiz request received for topic: {}", request.getExpression());
+
         List<QuizQuestion> questions = TOPIC_QUIZZES.getOrDefault(request.getExpression(), Collections.emptyList());
-        
+
         for (QuizQuestion question : questions) {
             responseObserver.onNext(question);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
+                logger.error("Thread interrupted during quiz generation.", e);
                 Thread.currentThread().interrupt();
             }
         }
@@ -105,19 +113,19 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
             @Override
             public void onNext(AnswerRequest answer) {
                 answers.add(answer);
-                // In a real implementation, you would validate the answer against the correct one
-                // For simplicity, we'll just count all answers as correct in this example
                 score++;
                 totalQuestions++;
+                logger.info("Received answer for question: {}", answer.getQuestionId());
             }
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("Error in submitAnswers: " + t.getMessage());
+                logger.error("Error in submitAnswers", t);
             }
 
             @Override
             public void onCompleted() {
+                logger.info("All answers received. Total: {}, Score: {}", totalQuestions, score);
                 QuizResultResponse response = QuizResultResponse.newBuilder()
                         .setScore(score)
                         .setFeedback(String.format("You scored %d out of %d", score, totalQuestions))
@@ -133,6 +141,8 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
         return new StreamObserver<ChatMessage>() {
             @Override
             public void onNext(ChatMessage message) {
+                logger.info("Received chat message: {}", message.getContent());
+
                 String userMessage = message.getContent().toLowerCase();
                 String responseText;
 
@@ -160,11 +170,12 @@ public class AITutorServiceImpl extends AITutorGrpc.AITutorImplBase {
 
             @Override
             public void onError(Throwable t) {
-                System.err.println("Error in tutorChat: " + t.getMessage());
+                logger.error("Error in tutorChat", t);
             }
 
             @Override
             public void onCompleted() {
+                logger.info("Chat session completed.");
                 responseObserver.onCompleted();
             }
         };

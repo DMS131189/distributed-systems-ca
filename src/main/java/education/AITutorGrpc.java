@@ -221,6 +221,9 @@ public final class AITutorGrpc {
   public static abstract class AITutorImplBase implements io.grpc.BindableService {
 
     /**
+     * <pre>
+     * unary
+     * </pre>
      */
     public void getTopics(education.AITutorOuterClass.GetTopicsRequest request,
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.GetTopicsResponse> responseObserver) {
@@ -235,6 +238,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * server stream
+     * </pre>
      */
     public void generateQuiz(education.AITutorOuterClass.GenerateQuizRequest request,
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.QuizQuestion> responseObserver) {
@@ -242,6 +248,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * client stream
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<education.AITutorOuterClass.AnswerRequest> submitAnswers(
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.QuizResultResponse> responseObserver) {
@@ -249,6 +258,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * bi-directional stream
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<education.AITutorOuterClass.ChatMessage> tutorChat(
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.ChatMessage> responseObserver) {
@@ -318,6 +330,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * unary
+     * </pre>
      */
     public void getTopics(education.AITutorOuterClass.GetTopicsRequest request,
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.GetTopicsResponse> responseObserver) {
@@ -334,6 +349,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * server stream
+     * </pre>
      */
     public void generateQuiz(education.AITutorOuterClass.GenerateQuizRequest request,
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.QuizQuestion> responseObserver) {
@@ -342,6 +360,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * client stream
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<education.AITutorOuterClass.AnswerRequest> submitAnswers(
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.QuizResultResponse> responseObserver) {
@@ -350,6 +371,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * bi-directional stream
+     * </pre>
      */
     public io.grpc.stub.StreamObserver<education.AITutorOuterClass.ChatMessage> tutorChat(
         io.grpc.stub.StreamObserver<education.AITutorOuterClass.ChatMessage> responseObserver) {
@@ -380,6 +404,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * unary
+     * </pre>
      */
     public education.AITutorOuterClass.GetTopicsResponse getTopics(education.AITutorOuterClass.GetTopicsRequest request) {
       return blockingUnaryCall(
@@ -394,6 +421,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * server stream
+     * </pre>
      */
     public java.util.Iterator<education.AITutorOuterClass.QuizQuestion> generateQuiz(
         education.AITutorOuterClass.GenerateQuizRequest request) {
@@ -424,6 +454,9 @@ public final class AITutorGrpc {
     }
 
     /**
+     * <pre>
+     * unary
+     * </pre>
      */
     public com.google.common.util.concurrent.ListenableFuture<education.AITutorOuterClass.GetTopicsResponse> getTopics(
         education.AITutorOuterClass.GetTopicsRequest request) {

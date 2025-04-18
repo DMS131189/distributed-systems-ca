@@ -16,35 +16,35 @@ import education.AITutorOuterClass.QuizQuestion;
 public class AITutorClient {
     public static void main(String[] args) {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 8080)
-            .usePlaintext()
-            .build();
+                .usePlaintext()
+                .build();
 
         AITutorGrpc.AITutorBlockingStub stub = AITutorGrpc.newBlockingStub(channel);
 
         // Example: Get topics with no API KEY
         try {
             GetTopicsResponse topicsError = stub.getTopics(
-                GetTopicsRequest.newBuilder().setApiKey(null).build());
+                    GetTopicsRequest.newBuilder().setApiKey(null).build());
         } catch (Exception e) {
             System.out.println("Error on trying get topics. Description: " + e.getMessage());
         }
 
         // Example: Get topics
         GetTopicsResponse topics = stub.getTopics(
-            GetTopicsRequest.newBuilder().setApiKey("secure123").build());
-        
+                GetTopicsRequest.newBuilder().setApiKey("secure123").build());
+
         System.out.println("Available Topics:");
-        topics.getTopicsList().forEach(topic -> 
-            System.out.println(topic.getId() + ": " + topic.getTitle()));
+        topics.getTopicsList().forEach(topic ->
+                System.out.println(topic.getId() + ": " + topic.getTitle()));
 
         // Example: Get Math quiz
         System.out.println("\nMath Quiz:");
         Iterator<QuizQuestion> questions = stub.generateQuiz(
-            GenerateQuizRequest.newBuilder()
-                .setExpression("1")
-                .setApiKey("secure123")
-                .build());
-        
+                GenerateQuizRequest.newBuilder()
+                        .setExpression("1")
+                        .setApiKey("secure123")
+                        .build());
+
         while (questions.hasNext()) {
             QuizQuestion question = questions.next();
             System.out.println("\nQ: " + question.getQuestion());
